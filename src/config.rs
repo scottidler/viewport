@@ -5,6 +5,33 @@ use std::path::{Path, PathBuf};
 
 use crate::cli::Cli;
 
+/// XDG config dir, honoring `$XDG_CONFIG_HOME` and falling back to `$HOME/.config`.
+fn xdg_config_dir() -> Option<PathBuf> {
+    if let Ok(dir) = std::env::var("XDG_CONFIG_HOME") {
+        let path = PathBuf::from(dir);
+        if path.is_absolute() {
+            return Some(path);
+        }
+    }
+    dirs::home_dir().map(|h| h.join(".config"))
+}
+
+/// XDG data dir, honoring `$XDG_DATA_HOME` and falling back to `$HOME/.local/share`.
+///
+/// We deliberately do NOT use the `dirs` config/data helpers: those honor
+/// `$XDG_CONFIG_HOME` / `$XDG_DATA_HOME` only on Linux. On macOS they resolve via system
+/// APIs and return `~/Library/...`, ignoring the env vars. These helpers resolve to the
+/// same XDG layout on every platform.
+pub fn xdg_data_dir() -> Option<PathBuf> {
+    if let Ok(dir) = std::env::var("XDG_DATA_HOME") {
+        let path = PathBuf::from(dir);
+        if path.is_absolute() {
+            return Some(path);
+        }
+    }
+    dirs::home_dir().map(|h| h.join(".local").join("share"))
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
 pub struct Config {
@@ -91,7 +118,7 @@ impl Config {
     }
 
     fn load_from_default_locations() -> Self {
-        if let Some(config_dir) = dirs::config_dir() {
+        if let Some(config_dir) = xdg_config_dir() {
             let project_name = env!("CARGO_PKG_NAME");
             let primary_config = config_dir.join(project_name).join(format!("{}.yml", project_name));
             if primary_config.exists() {
@@ -127,7 +154,7 @@ impl Config {
     }
 
     pub fn save(&self) -> Result<()> {
-        if let Some(config_dir) = dirs::config_dir() {
+        if let Some(config_dir) = xdg_config_dir() {
             let project_name = env!("CARGO_PKG_NAME");
             let config_path = config_dir.join(project_name).join(format!("{}.yml", project_name));
             if let Some(parent) = config_path.parent() {

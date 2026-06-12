@@ -18,7 +18,7 @@ pub fn resolve_log_level(cli_level: Option<&str>) -> String {
 /// Initialize tracing with daily rolling file appender at XDG data directory.
 /// Returns a guard that must be held for the lifetime of the program.
 pub fn setup_tracing(level: &str) -> Result<WorkerGuard> {
-    let log_dir = dirs::data_local_dir()
+    let log_dir = crate::config::xdg_data_dir()
         .unwrap_or_else(|| PathBuf::from("."))
         .join("viewport")
         .join("logs");
