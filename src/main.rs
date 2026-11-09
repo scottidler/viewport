@@ -61,7 +61,7 @@ fn main() -> Result<()> {
     let mut config = Config::load(&cli).context("Failed to load configuration")?;
 
     tracing::info!(
-        version = env!("GIT_DESCRIBE"),
+        version = env!("BUILD_VERSION"),
         device = %config.device,
         output_size = %config.output_size,
         fps = config.fps,

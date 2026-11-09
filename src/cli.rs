@@ -5,7 +5,7 @@ use std::path::PathBuf;
 #[command(
     name = "viewport",
     about = "Draggable screen region capture tool that outputs to a virtual camera",
-    version = env!("GIT_DESCRIBE"),
+    version = env!("BUILD_VERSION"),
     after_help = "Logs are written to: ~/.local/share/viewport/logs/viewport.log"
 )]
 pub struct Cli {

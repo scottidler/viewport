@@ -24,3 +24,4 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 yuvutils-rs = "0.8"
 
 [build-dependencies]
+build-version = { git = "https://github.com/tatari-tv/build-version-rs", tag = "v0.1.0", version = "0.1.0" }
