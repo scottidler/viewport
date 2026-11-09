@@ -181,6 +181,12 @@ tasks:
         cargo install cargo-mutants --version "$MUTANTS_VERSION" --locked
       fi
 
+      # The baseline build links gtk4 and pipewire; a bare CI runner has neither.
+      if [ -n "${CI:-}" ] && ! pkg-config --exists gtk4 libpipewire-0.3; then
+        sudo apt-get update
+        sudo apt-get install -y pkg-config libgtk-4-dev libpipewire-0.3-dev libclang-dev
+      fi
+
       # Every job gets its own workspace copy and target/. A RAM-backed /tmp fills and dies with
       # "No space left on device" after reporting zero survivors so far: a false green. Use a
       # disk-backed dir, and not one under a .git ancestor (tests that assert "not a repo" break).
